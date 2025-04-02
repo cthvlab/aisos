@@ -4,7 +4,7 @@
 use core::panic::PanicInfo;
 use bootloader_api::entry_point;
 use x86_64::instructions::interrupts;
-
+mod nvme;
 mod logger;
 mod pci;
 mod memory;
@@ -14,9 +14,9 @@ entry_point!(kernel_main);
 fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     logger::init();
 
-    println!("[OK] Rust Server OS booted!");
+    println!("[OK] aiSOS booted!");
     pci::scan_pci_devices();
-
+    nvme::init_nvme();
     loop {
         interrupts::enable_and_hlt();
     }
