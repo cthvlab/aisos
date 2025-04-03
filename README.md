@@ -25,7 +25,7 @@
    - **PLP (Power Loss Protection)** — защита данных при отключении питания.  
 
 3. **Сеть**  
-   - **DPDK** — ускоряет обработку пакетов в userspace (ключево для Rust-стека `smoltcp`).  
+   - **DPDK** — ускоряет обработку пакетов в userspace (ключевое для Rust-стека `smoltcp`).  
    - **Документация** — Intel публикует datasheets для своих NIC, Mellanox — только API.  
 
 4. **Отладка**  
