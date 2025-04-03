@@ -26,6 +26,36 @@ struct NvmeRegs {
     acq: u64,    // 0x30: Admin Completion Queue Base Address
 }
 
+#[repr(C)]
+#[derive(Debug)]
+struct IdentifyController {
+    vid: u16,
+    ssvid: u16,
+    sn: [u8; 20],
+    mn: [u8; 40],
+    fr: [u8; 8],
+    rab: u8,
+    ieee: [u8; 3],
+    mic: u8,
+    mdts: u8,
+    _reserved1: [u8; 178],
+    oacs: u16,
+    acl: u8,
+    aerl: u8,
+    frmw: u8,
+    lpa: u8,
+    elpe: u8,
+    npss: u8,
+    avscc: u8,
+    apsta: u8,
+    _reserved2: [u8; 246],
+    sqes: u8,
+    cqes: u8,
+    _reserved3: [u8; 2],
+    nn: u32, // Namespace count
+    // ... далее можно дополнить
+}
+
 pub fn init_nvme() {
     println!("[NVMe] Инициализация…");
 
@@ -154,6 +184,10 @@ pub fn init_nvme() {
     }
     println!();
 
+    let ctrl = unsafe { &*(identify_buf as *const IdentifyController) };
 
+    println!("[NVMe] Model: {}", core::str::from_utf8(&ctrl.mn).unwrap_or("invalid"));
+    println!("[NVMe] Serial: {}", core::str::from_utf8(&ctrl.sn).unwrap_or("invalid"));
+    println!("[NVMe] Namespaces: {}", ctrl.nn);
     
 }
