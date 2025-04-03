@@ -11,6 +11,7 @@
 | **Накопители (NVMe)** | • Формат U.2 (для прямого подключения) <br> • Поддержка PCIe 3.0+/4.0 <br> • Протокол NVMe 1.3+ <br> • Энергонезависимость (Power Loss Protection) | • 1TB PCIe 3.0 x4 <br> • Без HW-шифрования | • Intel SSD DC P4510 (enterprise) <br> • Samsung PM9A3 (высокая надёжность) |
 | **Сетевая карта (NIC)** | • Поддержка DPDK (`ixgbe`, `mlx4`) <br> • Скорость 10G+ <br> • Документированные регистры (для `no_std`-драйверов) <br> • PCIe x4/x8 | • Intel I350-T4 (1G, DPDK) <br> • Mellanox ConnectX-3 (10G) | • Intel X550-T2 (10G, полная документация) <br> • NVIDIA ConnectX-6 (25G, RDMA) |
 | **Память (RAM)**   | • ECC (для избежания ошибок) <br> • Минимум 16 ГБ (для компиляции Rust) <br> • Поддержка многоканального режима | • DDR4 2400 МГц <br> • 16 ГБ ECC | • DDR4 3200 МГц <br> • 32+ ГБ ECC RDIMM |
+| **GPU (CUDA)**     | • Поддержка CUDA 11+ <br> • 8+ GB VRAM <br> • PCIe 4.0 x16 <br> • Документированные регистры | • NVIDIA T4 | • NVIDIA A100 <br> • RTX 4090 |
 | **Отладка**        | • UART/Serial-порт (для `println!` в `no_std`) <br> • JTAG/SWD (аппаратная отладка) <br> • Логический анализатор (Saleae) | • USB-UART адаптер <br> • Segger J-Link EDU | • PCIe-адаптер с COM-портом <br> • Логический анализатор 500 МГц+ |
 
 ---
@@ -30,8 +31,13 @@
 
 4. **Отладка**  
    - **UART** — минимально необходим для вывода логов в `no_std`.  
-   - **JTAG** — для отладки на уровне процессора (например, при падениях в `unsafe`-коде).  
-
+   - **JTAG** — для отладки на уровне процессора (например, при падениях в `unsafe`-коде).
+     
+5. **GPU**:
+   - Обязательно: PCIe 4.0 x16 для уменьшения bottleneck
+   - Крейты: `rust-cuda`, `tch-rs` (Torch bindings)
+   - Для `no_std`: доступ к PCIe config space через `x86_64` крейты
+   - Tesla-серия лучше подходит для серверных решений (ECC память)
 ---
 
 ### **Идеальный набор для `no_std` Rust:**
@@ -39,7 +45,8 @@
 - **Материнка:** Supermicro H12SSL-NT (SlimSAS, UEFI, 8x PCIe x16).  
 - **NVMe:** Intel SSD DC P4510 2TB U.2 (PCIe 3.0 x4, PLP).  
 - **Сеть:** Intel X550-T2 (10G, DPDK).  
-- **Память:** 32 GB DDR4 ECC RDIMM.  
+- **Память:** 32 GB DDR4 ECC RDIMM.
+- **GPU** NVIDIA A100
 - **Отладка:** FTDI USB-UART + Saleae Logic 16.  
 
 Этот набор покрывает 99% задач: от embedded до гипервизоров. 
@@ -51,7 +58,7 @@
 | CPU       | AMD Ryzen 9 5950X (16 ядер) |
 | RAM       | 32+ GB DDR4 |
 | SSD       | NVMe SSD (например, Samsung 970 EVO Plus) |
-| GPU       | NVIDIA Tesla K80 (опционально) |
+| GPU       | NVIDIA Tesla T4 (опционально) |
 | Сеть      | Intel X550-T2 (10G) |
 
 ---
