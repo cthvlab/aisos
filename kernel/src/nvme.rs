@@ -1,7 +1,6 @@
-use crate::pci;
-use crate::println;
 use crate::{memory::mmio_map, println};
 use crate::pci::{self, PciDevice};
+use core::ptr::{read_volatile, write_volatile};
 
 const CLASS_MASS_STORAGE: u8 = 0x01;
 const SUBCLASS_NVME: u8 = 0x08;
@@ -28,18 +27,56 @@ pub fn init_nvme() {
     for dev in pci::devices() {
         if dev.class == 0x01 && dev.subclass == 0x08 {
             println!("[NVMe] Контроллер {:04x}:{:04x}", dev.vendor_id, dev.device_id);
-            let bar0 = dev.read_bar(0) & 0xFFFF_FFF0; // маска на MMIO
+            let bar0 = dev.read_bar(0) & 0xFFFF_FFF0;
             println!("[NVMe] BAR0 = {:#X}", bar0);
 
             let regs = unsafe { mmio_map::<NvmeRegs>(bar0) };
 
-            let cap = unsafe { core::ptr::read_volatile(&(*regs).cap) };
-            let vs = unsafe { core::ptr::read_volatile(&(*regs).vs) };
-            let csts = unsafe { core::ptr::read_volatile(&(*regs).csts) };
+            let cap = unsafe { read_volatile(&(*regs).cap) };
+            let timeout_ms = ((cap >> 24) & 0xFF) * 500;
+            let mqes = (cap & 0xFFFF) as u16;
+            let dstrd = ((cap >> 32) & 0xF) as u8;
 
-            println!("[NVMe] CAP  = {:#X}", cap);
-            println!("[NVMe] VS   = {}.{}", vs >> 16, vs & 0xFFFF);
-            println!("[NVMe] CSTS = {:#X}", csts);
+            println!("[NVMe] CAP.MQES   = {}", mqes);
+            println!("[NVMe] CAP.DSTRD  = {}", dstrd);
+            println!("[NVMe] CAP.TO     = {} ms", timeout_ms);
+
+            // Сбросим INT маски
+            unsafe {
+                write_volatile(&mut (*regs).intms, 0xFFFF_FFFF);
+                write_volatile(&mut (*regs).intmc, 0xFFFF_FFFF);
+            }
+
+            // Настройка CC (EN = 1)
+            let cc_value = (6 << 20) // I/O command set (NVM)
+                | (0 << 16)          // AMS
+                | (4 << 11)          // MPS (4 = 2^16 = 64 KB)
+                | (dstrd as u32)     // CSS default
+                | (1 << 0);          // EN = 1
+
+            unsafe {
+                write_volatile(&mut (*regs).cc, cc_value);
+            }
+
+            println!("[NVMe] CC записан, ожидаем CSTS.RDY…");
+
+            let mut ready = false;
+            for _ in 0..1000 {
+                let csts = unsafe { read_volatile(&(*regs).csts) };
+                if csts & 1 == 1 {
+                    ready = true;
+                    break;
+                }
+                crate::memory::wait_cycles(1_000_000); // задержка
+            }
+
+            if ready {
+                println!("[NVMe] Контроллер готов, CSTS.RDY = 1!");
+            } else {
+                println!("[NVMe] Ошибка: контроллер не вышел в Ready.");
+            }
+
+            return;
         }
     }
 }
