@@ -189,5 +189,49 @@ pub fn init_nvme() {
     println!("[NVMe] Model: {}", core::str::from_utf8(&ctrl.mn).unwrap_or("invalid"));
     println!("[NVMe] Serial: {}", core::str::from_utf8(&ctrl.sn).unwrap_or("invalid"));
     println!("[NVMe] Namespaces: {}", ctrl.nn);
+
+    let identify_ns_buf = unsafe { alloc_zeroed(identify_buf_layout) };
+
+    let cmd_ns = NvmeCommand {
+        opcode: 0x06, // Identify
+        cid: 2,
+        nsid: 1,
+        prp1: identify_ns_buf as u64,
+        cdw10: 0, // CNS = 0: Identify Namespace
+        ..Default::default()
+    };
+    
+    unsafe {
+        core::ptr::write_volatile(asq_ptr.add(1), cmd_ns);
+        write_volatile(doorbell, 2);
+    }
+
+    let read_buf_layout = Layout::from_size_align(4096, 4096).unwrap();
+    let read_buf = unsafe { alloc_zeroed(read_buf_layout) };
+
+    let read_cmd = NvmeCommand {
+        opcode: 0x02, // READ
+        cid: 3,
+        nsid: 1,
+        prp1: read_buf as u64,
+        cdw10: 0,       // LBA start
+        cdw12: 0,       // #blocks = cdw12 + 1 = 1
+        ..Default::default()
+    };
+    
+    unsafe {
+        core::ptr::write_volatile(asq_ptr.add(2), read_cmd);
+        write_volatile(doorbell, 3);
+    }
+
+    let block = unsafe { core::slice::from_raw_parts(read_buf, 512) };
+    println!("[NVMe] Содержимое блока 0:");
+    for b in block.iter().take(64) {
+        print!("{:02X} ", b);
+    }
+    println!();
+
+
+    
     
 }
