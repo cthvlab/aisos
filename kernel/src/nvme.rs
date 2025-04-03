@@ -8,13 +8,18 @@ const SUBCLASS_NVME: u8 = 0x08;
 
 #[repr(C)]
 struct NvmeRegs {
-    cap: u64,    // 0x00
-    vs: u32,     // 0x08
+    cap: u64,    // 0x00: Controller Capabilities
+    vs: u32,     // 0x08: Version
     _rsvd1: u32, // 0x0C
-    cc: u32,     // 0x14
+    intms: u32,  // 0x10
+    intmc: u32,  // 0x14
+    cc: u32,     // 0x14: Controller Configuration
     _rsvd2: u32, // 0x18
-    csts: u32,   // 0x1C
-    // остальные — позже
+    csts: u32,   // 0x1C: Controller Status
+    _rsvd3: [u32; 3], // 0x20–0x2C
+    aqa: u32,    // 0x24: Admin Queue Attributes
+    asq: u64,    // 0x28: Admin Submission Queue Base Address
+    acq: u64,    // 0x30: Admin Completion Queue Base Address
 }
 
 pub fn init_nvme() {
