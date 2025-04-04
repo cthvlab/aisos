@@ -79,8 +79,14 @@ aiSOS/
 │       ├── logger.rs                # VGA / Serial логгирование
 │       ├── pci.rs                   # PCI-сканирование (включая Tesla)
 │       ├── nvme.rs                  # NVMe-драйвер
+|       ├── nvme_cache.rs
+|       ├── fs.rs                    # in-memory файловая система
+|       ├── pkg.rs                   # менеджер RPK
+|       ├── acpi.rs / smp.rs         # для многоядерности
+|       ├── time.rs                  # таймеры
 │       ├── gpu.rs                   # BAR / DMA инициализация
 │       └── net/
+|           ├── mod.rs 
 │           ├── dpdk.rs              # Драйвер Intel X550-T2 через DPDK
 │           └── http.rs              # HTTP / WebSocket API
 ├── rpk/
