@@ -67,14 +67,14 @@
 
 ```
 aiSOS/
-├── Cargo.toml                       # Общий workspace для ядра, загрузчика и RPK
-├── boot/                            # UEFI-загрузчик (запускает ядро из EFI)
-│   └── Cargo.toml                   # Конфигурация UEFI-загрузчика
-├── kernel/                          # Ядро ОС на Rust (no_std)
-│   ├── Cargo.toml                   # Конфигурация ядра
-│   ├── x86_64-aisos.json            # JSON-файл таргета для ядра (no_std, bare-metal)
+├── Cargo.toml                      # Общий workspace для ядра, загрузчика и RPK
+├── boot/                           # UEFI-загрузчик (запускает ядро из EFI)
+│   └── Cargo.toml                  # Конфигурация UEFI-загрузчика
+├── kernel/                         # Ядро ОС на Rust (no_std)
+│   ├── Cargo.toml                  # Конфигурация ядра
+│   ├── x86_64-aisos.json           # JSON-файл таргета для ядра (no_std, bare-metal)
 │   └── src/
-│       ├── main.rs                  # Точка входа: _start(), panic_handler
+│       ├── main.rs                 # Точка входа: _start(), panic_handler
 │       ├── memory.rs               # Примитивы для работы с физ/вирт памятью
 │       ├── logger.rs               # Логгирование через VGA или COM-порт
 │       ├── pci.rs                  # PCI-сканирование: устройства, BAR, Tesla
@@ -89,7 +89,7 @@ aiSOS/
 │           ├── mod.rs              # Объединяющий модуль `net`
 │           ├── dpdk.rs             # Инициализация DPDK и Intel X550-T2
 │           └── http.rs             # HTTP / WebSocket сервер на ядре
-├── rpk/                             # Приложения в формате RPK (Rust Package Kernel)
+├── rpk/                            # Приложения в формате RPK (Rust Package Kernel)
 │   └── gemma_gpu/                  # Модуль инференса модели Gemma
 │       ├── Cargo.toml              # Конфигурация RPK-модуля
 │       ├── README.md               # Документация по использованию gemma_gpu.rpk
