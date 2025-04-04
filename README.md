@@ -72,7 +72,7 @@ aiSOS/
 ├── boot/                          # UEFI-загрузчик
 │   └── Cargo.toml                 # Конфигурация загрузчика
 
-├── kernel/                        # Ядро ОС (на Rust, no_std)
+├── kernel/                        # Ядро ОС
 │   ├── Cargo.toml                 # Конфигурация сборки ядра
 │   ├── x86_64-aisos.json          # Target JSON для ядра (без std, bare-metal)
 │   └── src/
@@ -115,7 +115,7 @@ aiSOS/
 │       │   ├── loader.rs          # Загрузка `.rpk` в адресное пространство
 │       │   └── scheduler.rs       # Планировщик задач
 │
-│       └── mod.rs                 # Корневой `mod.rs` (если потребуется)
+│       └── mod.rs                 # Корневой `mod.rs`
 │
 
 ├── rpk/                           # Песочница RPK-модулей
@@ -125,7 +125,7 @@ aiSOS/
 │       └── src/
 │           ├── main.rs            # Вход в модуль: выбор CPU или GPU
 │           ├── cpu.rs             # Инференс через candle / CPU
-│           ├── gpu.rs             # (Заготовка) Инференс через Tesla
+│           ├── gpu.rs             # Инференс через Tesla
 │           ├── fs.rs              # Чтение prompt'а / токенов из fs
 │           └── detect.rs          # Обнаружение наличия GPU
 
