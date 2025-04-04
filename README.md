@@ -67,16 +67,16 @@
 
 ```
 aiSOS/
-├── Cargo.toml                      # Общий workspace для ядра, загрузчика и модулей RPK
+├── Cargo.toml                     # Общий workspace для ядра, загрузчика и модулей RPK
 
-├── boot/                           # UEFI-загрузчик
-│   └── Cargo.toml                  # Конфигурация загрузчика
+├── boot/                          # UEFI-загрузчик
+│   └── Cargo.toml                 # Конфигурация загрузчика
 
-├── kernel/                         # Ядро ОС (на Rust, no_std)
-│   ├── Cargo.toml                  # Конфигурация сборки ядра
-│   ├── x86_64-aisos.json           # Target JSON для ядра (без std, bare-metal)
+├── kernel/                        # Ядро ОС (на Rust, no_std)
+│   ├── Cargo.toml                 # Конфигурация сборки ядра
+│   ├── x86_64-aisos.json          # Target JSON для ядра (без std, bare-metal)
 │   └── src/
-│       ├── main.rs                 # Точка входа: _start(), panic_handler
+│       ├── main.rs                # Точка входа: _start(), panic_handler
 │       ├── logger.rs              # VGA / COM логгирование
 │       ├── memory.rs              # Управление памятью (alloc, mapping)
 │       ├── dma.rs                 # DMA-аллокатор (для GPU/NIC)
@@ -118,7 +118,7 @@ aiSOS/
 │       └── mod.rs                 # Корневой `mod.rs` (если потребуется)
 │
 
-├── rpk/                            # Песочница RPK-модулей
+├── rpk/                           # Песочница RPK-модулей
 │   └── gemma_gpu/                 # Модуль инференса Gemma (CPU + GPU)
 │       ├── Cargo.toml             # Конфигурация модуля
 │       ├── README.md              # Документация к модулю
