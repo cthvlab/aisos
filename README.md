@@ -67,41 +67,42 @@
 
 ```
 aiSOS/
-├── Cargo.toml                       # Общий workspace
-├── boot/                            # UEFI-загрузчик
-│   └── Cargo.toml
-├── kernel/                          # Ядро ОС
-│   ├── Cargo.toml
-│   ├── x86_64-aisos.json            # Файл таргета для сборки ядра
+├── Cargo.toml                       # Общий workspace для ядра, загрузчика и RPK
+├── boot/                            # UEFI-загрузчик (запускает ядро из EFI)
+│   └── Cargo.toml                   # Конфигурация UEFI-загрузчика
+├── kernel/                          # Ядро ОС на Rust (no_std)
+│   ├── Cargo.toml                   # Конфигурация ядра
+│   ├── x86_64-aisos.json            # JSON-файл таргета для ядра (no_std, bare-metal)
 │   └── src/
-│       ├── main.rs                  # Точка входа
-│       ├── memory.rs                # Работа с памятью
-│       ├── logger.rs                # VGA / Serial логгирование
-│       ├── pci.rs                   # PCI-сканирование (включая Tesla)
-│       ├── nvme.rs                  # NVMe-драйвер
-|       ├── nvme_cache.rs
-|       ├── fs.rs                    # in-memory файловая система
-|       ├── pkg.rs                   # менеджер RPK
-|       ├── acpi.rs / smp.rs         # для многоядерности
-|       ├── time.rs                  # таймеры
-│       ├── gpu.rs                   # BAR / DMA инициализация
-│       └── net/
-|           ├── mod.rs 
-│           ├── dpdk.rs              # Драйвер Intel X550-T2 через DPDK
-│           └── http.rs              # HTTP / WebSocket API
-├── rpk/
-│   └── gemma_gpu/
-│       ├── Cargo.toml
-│       ├── README.md                # Документация модуля
+│       ├── main.rs                  # Точка входа: _start(), panic_handler
+│       ├── memory.rs               # Примитивы для работы с физ/вирт памятью
+│       ├── logger.rs               # Логгирование через VGA или COM-порт
+│       ├── pci.rs                  # PCI-сканирование: устройства, BAR, Tesla
+│       ├── nvme.rs                 # Базовый NVMe-драйвер (чтение/запуск)
+│       ├── nvme_cache.rs           # Кэш слоёв NVMe (например, LRU/буферы блоков)
+│       ├── fs.rs                   # In-memory файловая система: `/fs/*`
+│       ├── pkg.rs                  # Установка, управление и запуск `.rpk` модулей
+│       ├── acpi.rs / smp.rs        # Поддержка многопоточности, запуск ядер
+│       ├── time.rs                 # Таймеры, тикеры, задержки
+│       ├── gpu.rs                  # BAR/DMA инициализация видеокарт (NVIDIA Tesla)
+│       └── net/                    # Сетевая подсистема
+│           ├── mod.rs              # Объединяющий модуль `net`
+│           ├── dpdk.rs             # Инициализация DPDK и Intel X550-T2
+│           └── http.rs             # HTTP / WebSocket сервер на ядре
+├── rpk/                             # Приложения в формате RPK (Rust Package Kernel)
+│   └── gemma_gpu/                  # Модуль инференса модели Gemma
+│       ├── Cargo.toml              # Конфигурация RPK-модуля
+│       ├── README.md               # Документация по использованию gemma_gpu.rpk
 │       └── src/
-│           ├── main.rs
-│           ├── cpu.rs
-│           ├── gpu.rs
-│           ├── fs.rs
-│           └── detect.rs
-├── static/
-│   └── ai_chat_ws.html              # WebSocket UI для AI
-└── README.md                        # Главная документация
+│           ├── main.rs             # Вход в модуль: выбор CPU или GPU инференса
+│           ├── cpu.rs              # Инференс через candle / CPU backend
+│           ├── gpu.rs              # Заготовка под CUDA-инференс через Tesla
+│           ├── fs.rs               # Чтение входа / токенов / prompt
+│           └── detect.rs           # Обнаружение доступности Tesla или GPU
+├── static/                         # Статические ресурсы
+│   └── ai_chat_ws.html             # UI для чата с ИИ через WebSocket
+└── README.md                       # Основная документация проекта и сборки
+
 
 ```
 
