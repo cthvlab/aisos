@@ -27,9 +27,11 @@ entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     logger::init();
-    println!("[OK] aiSOS booted!");
-
+    logger::log("aiSOS booted!", logger::LogLevel::Info);
+    
     let memory_manager = memory::init_memory(boot_info);
+    
+    logger::log("Memory management initialized", logger::LogLevel::Info);
     dma::init_dma(&memory_manager);
     pci::scan_pci_devices();
     nvme::init_nvme();
